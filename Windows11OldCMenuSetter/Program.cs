@@ -8,21 +8,54 @@ internal sealed class Program
     {
         Console.BackgroundColor = ConsoleColor.Black;
         Console.ForegroundColor = ConsoleColor.White;
-        if (Environment.OSVersion.Version.Build < 22000)
+        if (Environment.OSVersion.Version.Build >= 22000)
         {
-            SendError("Operating System is not Windows 11. Cancelling...");
-            Console.ReadLine();
-            return;
+            string result = "";
+            RegistryKey key = Registry.CurrentUser.OpenSubKey(@"Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32");
+            if (key != null)
+            {
+                SendWarning("Key: " + key + " already exists. Checking value...");
+                string value = key.GetValue("").ToString();
+                if (value == "")
+                {
+                    SendWarning("Value was already set correctly");
+                    Console.Write("Do you want to Remove it? (y/n)>");
+                    result = Console.ReadLine();
+                    if (result == "y" || result == "yes")
+                    {
+                        SendError("Deleting Subkeys...");
+                        Registry.CurrentUser.OpenSubKey(@"Software\Classes\CLSID\").DeleteSubKeyTree("{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}");
+                        SendError("Successfully deleted Subkeys");
+                    }
+                    else
+                    {
+                        Console.Write("Do you want to Overwrite it? (y/n)>");
+                        result = Console.ReadLine();
+                        if (result == "y" || result == "yes")
+                        {
+
+                        }
+                        else
+                        {
+                            Console.WriteLine("Exiting...");
+                        }
+                    }
+                }
+                else
+                    SendError("Value is wrong. Overwriting...");
+            }
+            if (CreateKeys())
+                SendSuccess("Keys created");
+            else
+                SendError("An error occured or User cancelled the task");
+            result = "";
+            result = CheckKeys();
+            if (result == "")
+                SendSuccess("Keys checked. All keys successfully created.");
+            else
+                SendError("Error. key: " + result + " wasn't created");
         }
-        if (CreateKeys())
-            SendSuccess("Keys created");
-        else
-            SendError("An error occured or User cancelled the task");
-        string result = CheckKeys();
-        if (result == "")
-            SendSuccess("Keys checked. All keys successfully created.");
-        else
-            SendError("Error. key: " + result + " wasn't created");
+        SendError("Operating System is not Windows 11. Cancelling...");
         Console.ReadLine();
     }
 
@@ -100,6 +133,13 @@ internal sealed class Program
     {
         ConsoleColor color = Console.ForegroundColor;
         Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine(message);
+        Console.ForegroundColor = color;
+    }
+    static void SendWarning(string message)
+    {
+        ConsoleColor color = Console.ForegroundColor;
+        Console.ForegroundColor = ConsoleColor.Yellow;
         Console.WriteLine(message);
         Console.ForegroundColor = color;
     }
