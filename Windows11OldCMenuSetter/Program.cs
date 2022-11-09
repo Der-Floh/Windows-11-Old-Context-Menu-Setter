@@ -46,7 +46,7 @@ internal sealed class Program
                 if (result == "y" || result == "yes")
                 {
                     SendError("Deleting Subkeys...");
-                    Registry.CurrentUser.OpenSubKey(@"Software\Classes\CLSID\").DeleteSubKeyTree("{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}");
+                    Registry.CurrentUser.OpenSubKey(@"Software\Classes\CLSID\", true).DeleteSubKeyTree("{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}");
                     SendError("Successfully deleted Subkeys");
                     return 'd';
                 }
