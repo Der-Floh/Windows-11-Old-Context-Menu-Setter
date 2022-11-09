@@ -1,4 +1,7 @@
 # Windows 11 Old Context Menu-Setter
+[![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/Der-Floh/Windows-11-Old-Context-Menu-Setter/blob/master/README.md)
+[![de](https://img.shields.io/badge/lang-de-green.svg)](https://github.com/Der-Floh/Windows-11-Old-Context-Menu-Setter/blob/master/README.de.md)
+
 A program that activates the old "Right Click Menu" in Windows 11. So you don't have to click "Show more" everytime. It works by setting a few Registry keys (like any online tutorial would teach you)
 
 Current Version can be found under [Releases](https://github.com/Der-Floh/Windows-11-Old-Context-Menu-Setter/releases)
