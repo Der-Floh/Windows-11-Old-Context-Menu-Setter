@@ -10,53 +10,67 @@ internal sealed class Program
         Console.ForegroundColor = ConsoleColor.White;
         if (Environment.OSVersion.Version.Build >= 22000)
         {
-            string result = "";
-            RegistryKey key = Registry.CurrentUser.OpenSubKey(@"Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32");
-            if (key != null)
+            char aleradySet = CheckAlreadySet();
+            if (aleradySet == 'n' || aleradySet == 'o')
             {
-                SendWarning("Key: " + key + " already exists. Checking value...");
-                string value = key.GetValue("").ToString();
-                if (value == "")
-                {
-                    SendWarning("Value was already set correctly");
-                    Console.Write("Do you want to Remove it? (y/n)>");
-                    result = Console.ReadLine();
-                    if (result == "y" || result == "yes")
-                    {
-                        SendError("Deleting Subkeys...");
-                        Registry.CurrentUser.OpenSubKey(@"Software\Classes\CLSID\").DeleteSubKeyTree("{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}");
-                        SendError("Successfully deleted Subkeys");
-                    }
-                    else
-                    {
-                        Console.Write("Do you want to Overwrite it? (y/n)>");
-                        result = Console.ReadLine();
-                        if (result == "y" || result == "yes")
-                        {
+                if (CreateKeys())
+                    SendSuccess("Keys created");
+                else
+                    SendError("An error occured or User cancelled the task");
 
-                        }
-                        else
-                        {
-                            Console.WriteLine("Exiting...");
-                        }
-                    }
+                string result = CheckKeys();
+                if (result == "")
+                    SendSuccess("Keys checked. All keys successfully created.");
+                else
+                    SendError("Error. key: " + result + " wasn't created");
+            }
+        }
+        else
+            SendError("Operating System is not Windows 11. Cancelling...");
+        Console.ReadLine();
+    }
+
+    static char CheckAlreadySet()
+    {
+        string result = "";
+        RegistryKey key = Registry.CurrentUser.OpenSubKey(@"Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32");
+        if (key != null)
+        {
+            SendWarning("Key: " + key + " already exists. Checking value...");
+            string value = key.GetValue("").ToString();
+            if (value == "")
+            {
+                SendWarning("Value was already set correctly");
+                Console.Write("Do you want to Remove it? (y/n)>");
+                result = Console.ReadLine();
+                if (result == "y" || result == "yes")
+                {
+                    SendError("Deleting Subkeys...");
+                    Registry.CurrentUser.OpenSubKey(@"Software\Classes\CLSID\").DeleteSubKeyTree("{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}");
+                    SendError("Successfully deleted Subkeys");
+                    return 'd';
                 }
                 else
-                    SendError("Value is wrong. Overwriting...");
+                {
+                    Console.Write("Do you want to Overwrite it? (y/n)>");
+                    result = Console.ReadLine();
+                    if (result == "y" || result == "yes")
+                        return 'o';
+                    else
+                    {
+                        Console.WriteLine("Exiting...");
+                        return 'e';
+                    }
+                }
             }
-            if (CreateKeys())
-                SendSuccess("Keys created");
             else
-                SendError("An error occured or User cancelled the task");
-            result = "";
-            result = CheckKeys();
-            if (result == "")
-                SendSuccess("Keys checked. All keys successfully created.");
-            else
-                SendError("Error. key: " + result + " wasn't created");
+            {
+                SendError("Value is wrong. Overwriting...");
+                return 'o';
+            }
         }
-        SendError("Operating System is not Windows 11. Cancelling...");
-        Console.ReadLine();
+        else
+            return 'n';
     }
 
     static bool CreateKeys()
@@ -116,7 +130,7 @@ internal sealed class Program
         if (value != "")
         {
             SendError(@"Keyvalue InprocServer32 is: '" + value + "' But should be: ''");
-            return "Value wrong";
+            return "value blank";
         }
         SendSuccess(@"Keyvalue InprocServer32 is correct: '" + value + "'");
         return "";
@@ -124,23 +138,21 @@ internal sealed class Program
 
     static void SendError(string message)
     {
-        ConsoleColor color = Console.ForegroundColor;
-        Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine(message);
-        Console.ForegroundColor = color;
+        SendInColor(message, ConsoleColor.Red);
     }
     static void SendSuccess(string message)
     {
-        ConsoleColor color = Console.ForegroundColor;
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine(message);
-        Console.ForegroundColor = color;
+        SendInColor(message, ConsoleColor.Green);
     }
     static void SendWarning(string message)
     {
-        ConsoleColor color = Console.ForegroundColor;
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine(message);
+        SendInColor(message, ConsoleColor.Yellow);
+    }
+    static void SendInColor(string message, ConsoleColor color)
+    {
+        ConsoleColor colorOld = Console.ForegroundColor;
         Console.ForegroundColor = color;
+        Console.WriteLine(message);
+        Console.ForegroundColor = colorOld;
     }
 }
