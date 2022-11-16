@@ -7,7 +7,7 @@ A program that activates the old "Right Click Menu" in Windows 11. So you don't 
 Current Version can be found under [Releases](https://github.com/Der-Floh/Windows-11-Old-Context-Menu-Setter/releases)
 
 ## Usage
-Just start the Program 🙃
+Just start the Program🙃
 
 ## How to Remove it
 If the key already exists the program will ask if you want to delete it.
