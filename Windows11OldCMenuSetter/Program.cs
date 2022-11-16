@@ -52,6 +52,7 @@ internal sealed class Program
                     SendError("Deleting Subkeys...");
                     Registry.CurrentUser.OpenSubKey(@"Software\Classes\CLSID\", true).DeleteSubKeyTree("{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}");
                     SendError("Successfully deleted Subkeys");
+                    RestartExplorer();
                     return 'd';
                 }
                 else
@@ -162,18 +163,15 @@ internal sealed class Program
 
     static void RestartExplorer()
     {
-        using (Process process = new Process())
+        Process process = new Process();
+        process.StartInfo = new ProcessStartInfo
         {
-            process.StartInfo = new ProcessStartInfo
-            {
-                FileName = "taskkill.exe",
-                Arguments = "-f -im explorer.exe",
-                WindowStyle = ProcessWindowStyle.Hidden
-            };
-            process.Start();
-            process.WaitForExit();
-            process.StartInfo = new ProcessStartInfo("explorer.exe");
-            process.Start();
-        }
+            FileName = "taskkill.exe",
+            Arguments = "-f -im explorer.exe",
+            WindowStyle = ProcessWindowStyle.Hidden
+        };
+        process.Start();
+        process.WaitForExit();
+        Process.Start("explorer.exe");
     }
 }
