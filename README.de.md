@@ -6,7 +6,7 @@ Ein Programm, welches das alte "Rechtsclickmenü" in Windows 11 aktiviert. So mu
 Aktuelle Version kann unter [Releases](https://github.com/Der-Floh/Windows-11-Old-Context-Menu-Setter/releases) gefunden werden
 
 ## Nutzung
-Einfach das Programm starten 🙃
+Einfach das Programm starten🙃
 
 ## Wie es zu entfernen ist
 Wenn der key schon existiert wird das Programm fragen, ob man es entfernen möchte.
