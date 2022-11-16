@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using System.Diagnostics;
 
 namespace Windows11OldCMenuSetter;
 
@@ -20,7 +21,10 @@ internal sealed class Program
 
                 string result = CheckKeys();
                 if (result == "")
+                {
                     SendSuccess("Keys checked. All keys successfully created.");
+                    RestartExplorer();
+                }
                 else
                     SendError("Error. key: " + result + " wasn't created");
             }
@@ -154,5 +158,22 @@ internal sealed class Program
         Console.ForegroundColor = color;
         Console.WriteLine(message);
         Console.ForegroundColor = colorOld;
+    }
+
+    static void RestartExplorer()
+    {
+        using (Process process = new Process())
+        {
+            process.StartInfo = new ProcessStartInfo
+            {
+                FileName = "taskkill.exe",
+                Arguments = "-f -im explorer.exe",
+                WindowStyle = ProcessWindowStyle.Hidden
+            };
+            process.Start();
+            process.WaitForExit();
+            process.StartInfo = new ProcessStartInfo("explorer.exe");
+            process.Start();
+        }
     }
 }
