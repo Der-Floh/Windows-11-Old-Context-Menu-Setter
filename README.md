@@ -21,3 +21,7 @@ The explorer needs to be restarted to apply the changes.
 Yes. By following this Tutorial using the Regestry editor: https://pureinfotech.com/bring-back-classic-context-menu-windows-11
 
 Or by using a cmd command described in this Microsoft Post: https://answers.microsoft.com/en-us/windows/forum/all/restore-legacy-right-click-menu-for-file-explorer/a62e797c-eaf3-411b-aeec-e460e6e5a82a
+
+<br/>
+
+[!["Buy me a Floppy Disk"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/der_floh)
