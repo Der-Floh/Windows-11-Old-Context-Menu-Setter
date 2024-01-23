@@ -3,54 +3,64 @@ using System.Diagnostics;
 
 namespace Windows11OldCMenuSetter;
 
-internal sealed class Program
+public sealed class Program
 {
-    static void Main(string[] args)
+    static void Main()
     {
         Console.BackgroundColor = ConsoleColor.Black;
         Console.ForegroundColor = ConsoleColor.White;
         if (Environment.OSVersion.Version.Build >= 22000)
         {
-            char aleradySet = CheckAlreadySet();
-            if (aleradySet == 'n' || aleradySet == 'o')
+            var alreadySet = CheckAlreadySet();
+            if (alreadySet is 'n' or 'o')
             {
                 if (CreateKeys())
+                {
                     SendSuccess("Keys created");
+                }
                 else
-                    SendError("An error occured or User cancelled the task");
+                {
+                    SendError("An error occurred or User cancelled the task");
+                }
 
-                string result = CheckKeys();
+                var result = CheckKeys();
                 if (result == "")
                 {
                     SendSuccess("Keys checked. All keys successfully created.");
                     RestartExplorer();
                 }
                 else
+                {
                     SendError("Error. key: " + result + " wasn't created");
+                }
             }
         }
         else
+        {
             SendError("Operating System is not Windows 11. Cancelling...");
-        Console.ReadLine();
+        }
+
+        Console.Write("Press any key to exit...");
+        Console.ReadKey();
     }
 
     static char CheckAlreadySet()
     {
-        string result = "";
-        RegistryKey key = Registry.CurrentUser.OpenSubKey(@"Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32");
+        string? result;
+        RegistryKey? key = Registry.CurrentUser.OpenSubKey(@"Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32");
         if (key != null)
         {
             SendWarning("Key: " + key + " already exists. Checking value...");
-            string value = key.GetValue("").ToString();
+            var value = key.GetValue("")?.ToString();
             if (value == "")
             {
                 SendWarning("Value was already set correctly");
                 Console.Write("Do you want to Remove it? (y/n)>");
                 result = Console.ReadLine();
-                if (result == "y" || result == "yes")
+                if (result is "y" or "yes")
                 {
                     SendError("Deleting Subkeys...");
-                    Registry.CurrentUser.OpenSubKey(@"Software\Classes\CLSID\", true).DeleteSubKeyTree("{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}");
+                    Registry.CurrentUser.OpenSubKey(@"Software\Classes\CLSID\", true)?.DeleteSubKeyTree("{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}");
                     SendError("Successfully deleted Subkeys");
                     RestartExplorer();
                     return 'd';
@@ -59,8 +69,10 @@ internal sealed class Program
                 {
                     Console.Write("Do you want to Overwrite it? (y/n)>");
                     result = Console.ReadLine();
-                    if (result == "y" || result == "yes")
+                    if (result is "y" or "yes")
+                    {
                         return 'o';
+                    }
                     else
                     {
                         Console.WriteLine("Exiting...");
@@ -75,24 +87,32 @@ internal sealed class Program
             }
         }
         else
+        {
             return 'n';
+        }
     }
 
     static bool CreateKeys()
     {
         Console.WriteLine("Creating Keys...");
-        RegistryKey key = Registry.CurrentUser.OpenSubKey(@"Software\Classes\CLSID", true);
+        RegistryKey? key = Registry.CurrentUser.OpenSubKey(@"Software\Classes\CLSID", true);
         if (key != null)
+        {
             Console.WriteLine(@"Found Key: " + key.ToString());
+        }
         else
         {
             SendError(@"Key: Computer\HKEY_CURRENT_USER\Software\Classes\CLSID wasn't found.");
             Console.Write("Do you want to Create the Key? (y/n)>");
-            string result = Console.ReadLine().ToLower();
-            if (result == "y" || result == "yes")
+            var result = Console.ReadLine()?.ToLower();
+            if (result is "y" or "yes")
+            {
                 key = Registry.CurrentUser.CreateSubKey(@"Software\Classes\CLSID", true);
+            }
             else
+            {
                 return false;
+            }
         }
         key = key.CreateSubKey("{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}", true);
         Console.WriteLine("Created Key: " + key);
@@ -107,7 +127,7 @@ internal sealed class Program
     {
         Console.WriteLine("Checking created Keys...");
 
-        RegistryKey key = Registry.CurrentUser.OpenSubKey(@"Software\Classes\CLSID");
+        RegistryKey? key = Registry.CurrentUser.OpenSubKey(@"Software\Classes\CLSID");
         if (key == null)
         {
             SendError(@"Key: Computer\HKEY_CURRENT_USER\Software\Classes\CLSID wasn't found.");
@@ -131,28 +151,19 @@ internal sealed class Program
         }
         SendSuccess("Found Key: " + key.ToString());
 
-        string value = key.GetValue("").ToString();
+        var value = key.GetValue("")?.ToString();
         if (value != "")
         {
-            SendError(@"Keyvalue InprocServer32 is: '" + value + "' But should be: ''");
+            SendError(@"Key value InprocServer32 is: '" + value + "' But should be: ''");
             return "value blank";
         }
-        SendSuccess(@"Keyvalue InprocServer32 is correct: '" + value + "'");
+        SendSuccess(@"Key value InprocServer32 is correct: '" + value + "'");
         return "";
     }
 
-    static void SendError(string message)
-    {
-        SendInColor(message, ConsoleColor.Red);
-    }
-    static void SendSuccess(string message)
-    {
-        SendInColor(message, ConsoleColor.Green);
-    }
-    static void SendWarning(string message)
-    {
-        SendInColor(message, ConsoleColor.Yellow);
-    }
+    static void SendError(string message) => SendInColor(message, ConsoleColor.Red);
+    static void SendSuccess(string message) => SendInColor(message, ConsoleColor.Green);
+    static void SendWarning(string message) => SendInColor(message, ConsoleColor.Yellow);
     static void SendInColor(string message, ConsoleColor color)
     {
         ConsoleColor colorOld = Console.ForegroundColor;
@@ -163,12 +174,14 @@ internal sealed class Program
 
     static void RestartExplorer()
     {
-        Process process = new Process();
-        process.StartInfo = new ProcessStartInfo
+        var process = new Process
         {
-            FileName = "taskkill.exe",
-            Arguments = "-f -im explorer.exe",
-            WindowStyle = ProcessWindowStyle.Hidden
+            StartInfo = new ProcessStartInfo
+            {
+                FileName = "taskkill.exe",
+                Arguments = "-f -im explorer.exe",
+                WindowStyle = ProcessWindowStyle.Hidden
+            }
         };
         process.Start();
         process.WaitForExit();
